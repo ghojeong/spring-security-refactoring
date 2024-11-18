@@ -4,7 +4,6 @@ import nextstep.security.access.*;
 import nextstep.security.config.annotation.HttpSecurity;
 import nextstep.security.config.annotation.SecurityConfigurer;
 import nextstep.security.web.csrf.CsrfFilter;
-import nextstep.security.web.csrf.CsrfTokenRepository;
 
 import java.util.ArrayList;
 import java.util.List;
