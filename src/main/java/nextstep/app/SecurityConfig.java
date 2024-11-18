@@ -70,13 +70,6 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        return new ProviderManager(List.of(
-                new DaoAuthenticationProvider(userDetailsService),
-                new OAuth2LoginAuthenticationProvider(oAuth2UserService)));
-    }
-
 //    @Bean
 //    public SecurityFilterChain securityFilterChain() {
 //        return new DefaultSecurityFilterChain(
@@ -98,6 +91,7 @@ public class SecurityConfig {
                 .csrf(c -> c.ignoringRequestMatchers("/login"))
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
+                .oauth2Login(Customizer.withDefaults())
                 .build();
     }
 
