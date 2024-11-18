@@ -1,7 +1,6 @@
 package nextstep.app;
 
 import nextstep.oauth2.OAuth2ClientProperties;
-import nextstep.oauth2.authentication.OAuth2LoginAuthenticationProvider;
 import nextstep.oauth2.registration.ClientRegistration;
 import nextstep.oauth2.registration.ClientRegistrationRepository;
 import nextstep.oauth2.userinfo.OAuth2UserService;
@@ -10,9 +9,6 @@ import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcherEntry;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchyImpl;
-import nextstep.security.authentication.AuthenticationManager;
-import nextstep.security.authentication.DaoAuthenticationProvider;
-import nextstep.security.authentication.ProviderManager;
 import nextstep.security.authorization.*;
 import nextstep.security.config.Customizer;
 import nextstep.security.config.DelegatingFilterProxy;
@@ -89,6 +85,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain2(HttpSecurity http) {
         return http
                 .csrf(c -> c.ignoringRequestMatchers("/login"))
+                .authorizeHttpRequests(
+                        authorizeHttpRequests -> authorizeHttpRequests
+                                .addEntry(new MvcRequestMatcher(HttpMethod.GET, "/members"), new AuthorityAuthorizationManager(roleHierarchy(), "ADMIN"))
+                                .addEntry(new MvcRequestMatcher(HttpMethod.GET, "/members/me"), new AuthorityAuthorizationManager(roleHierarchy(), "USER"))
+                                .addEntry(AnyRequestMatcher.INSTANCE, new PermitAllAuthorizationManager()))
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
                 .oauth2Login(Customizer.withDefaults())
