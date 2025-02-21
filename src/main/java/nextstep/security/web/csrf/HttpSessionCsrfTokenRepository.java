@@ -7,11 +7,17 @@ import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 
 // NOTE: https://github.com/spring-projects/spring-security/blob/main/web/src/main/java/org/springframework/security/web/csrf/HttpSessionCsrfTokenRepository.java
-public class HttpSessionCsrfTokenRepository implements CsrfTokenRepository {
+public final class HttpSessionCsrfTokenRepository implements CsrfTokenRepository {
     private static final String PARAMETER_NAME = "_csrf";
     private static final String HEADER_NAME = "X-CSRF-TOKEN";
     private static final String ATTRIBUTE_NAME = HttpSessionCsrfTokenRepository.class
             .getName().concat(".CSRF_TOKEN");
+
+    private HttpSessionCsrfTokenRepository() {}
+
+    public static HttpSessionCsrfTokenRepository getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
 
     @Override
     public CsrfToken generateToken(HttpServletRequest request) {
@@ -37,5 +43,9 @@ public class HttpSessionCsrfTokenRepository implements CsrfTokenRepository {
             return null;
         }
         return (CsrfToken) session.getAttribute(ATTRIBUTE_NAME);
+    }
+
+    private static class SingletonHolder {
+        private static final HttpSessionCsrfTokenRepository INSTANCE = new HttpSessionCsrfTokenRepository();
     }
 }
