@@ -13,14 +13,24 @@ import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.RequestMatcherEntry;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchyImpl;
-import nextstep.security.authentication.*;
-import nextstep.security.authorization.*;
+import nextstep.security.authentication.AuthenticationManager;
+import nextstep.security.authentication.BasicAuthenticationFilter;
+import nextstep.security.authentication.DaoAuthenticationProvider;
+import nextstep.security.authentication.ProviderManager;
+import nextstep.security.authentication.UsernamePasswordAuthenticationFilter;
+import nextstep.security.authorization.AuthorityAuthorizationManager;
+import nextstep.security.authorization.AuthorizationFilter;
+import nextstep.security.authorization.AuthorizationManager;
+import nextstep.security.authorization.PermitAllAuthorizationManager;
+import nextstep.security.authorization.RequestMatcherDelegatingAuthorizationManager;
+import nextstep.security.authorization.SecuredMethodInterceptor;
 import nextstep.security.config.DefaultSecurityFilterChain;
 import nextstep.security.config.DelegatingFilterProxy;
 import nextstep.security.config.FilterChainProxy;
 import nextstep.security.config.SecurityFilterChain;
 import nextstep.security.context.SecurityContextHolderFilter;
 import nextstep.security.userdetails.UserDetailsService;
+import nextstep.security.web.csrf.CsrfFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,7 +84,8 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(List.of(
                 new DaoAuthenticationProvider(userDetailsService),
-                new OAuth2LoginAuthenticationProvider(oAuth2UserService)));
+                new OAuth2LoginAuthenticationProvider(oAuth2UserService)
+        ));
     }
 
     @Bean
@@ -86,7 +97,8 @@ public class SecurityConfig {
                         new BasicAuthenticationFilter(authenticationManager()),
                         new OAuth2AuthorizationRequestRedirectFilter(clientRegistrationRepository()),
                         new OAuth2LoginAuthenticationFilter(clientRegistrationRepository(), new OAuth2AuthorizedClientRepository(), authenticationManager()),
-                        new AuthorizationFilter(requestAuthorizationManager())
+                        new AuthorizationFilter(requestAuthorizationManager()),
+                        new CsrfFilter()
                 )
         );
     }
@@ -106,16 +118,20 @@ public class SecurityConfig {
         return new ClientRegistrationRepository(registrations);
     }
 
-    private static Map<String, ClientRegistration> getClientRegistrations(OAuth2ClientProperties properties) {
-        Map<String, ClientRegistration> clientRegistrations = new HashMap<>();
-        properties.getRegistration().forEach((key, value) -> clientRegistrations.put(key,
-                getClientRegistration(key, value, properties.getProvider().get(key))));
+    private Map<String, ClientRegistration> getClientRegistrations(OAuth2ClientProperties properties) {
+        final Map<String, ClientRegistration> clientRegistrations = new HashMap<>();
+        properties.getRegistration().forEach((key, value) -> clientRegistrations.put(
+                key,
+                getClientRegistration(key, value, properties.getProvider().get(key))
+        ));
         return clientRegistrations;
     }
 
-    private static ClientRegistration getClientRegistration(String registrationId,
-                                                            OAuth2ClientProperties.Registration registration, OAuth2ClientProperties.Provider provider) {
+    private ClientRegistration getClientRegistration(
+            String registrationId,
+            OAuth2ClientProperties.Registration registration,
+            OAuth2ClientProperties.Provider provider
+    ) {
         return new ClientRegistration(registrationId, registration.getClientId(), registration.getClientSecret(), registration.getRedirectUri(), registration.getScope(), provider.getAuthorizationUri(), provider.getTokenUri(), provider.getUserInfoUri(), provider.getUserNameAttributeName());
     }
 }
-
