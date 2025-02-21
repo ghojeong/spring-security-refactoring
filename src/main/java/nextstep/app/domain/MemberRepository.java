@@ -9,4 +9,6 @@ public interface MemberRepository {
     List<Member> findAll();
 
     Member save(Member member);
+
+    void clear();
 }

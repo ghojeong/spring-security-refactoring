@@ -1,6 +1,5 @@
 package nextstep.app;
 
-import nextstep.app.domain.Member;
 import nextstep.app.domain.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +12,8 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Set;
-
+import static nextstep.app.MemberFixture.TEST_ADMIN_MEMBER;
+import static nextstep.app.MemberFixture.TEST_USER_MEMBER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,9 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class FormLoginTest {
-    private final Member TEST_ADMIN_MEMBER = new Member("a@a.com", "password", "a", "", Set.of("ADMIN"));
-    private final Member TEST_USER_MEMBER = new Member("b@b.com", "password", "b", "", Set.of());
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -33,8 +29,7 @@ class FormLoginTest {
 
     @BeforeEach
     void setUp() {
-        memberRepository.save(TEST_ADMIN_MEMBER);
-        memberRepository.save(TEST_USER_MEMBER);
+        MemberFixture.setUp(memberRepository);
     }
 
     @DisplayName("로그인 성공")

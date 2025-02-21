@@ -29,4 +29,9 @@ public class InmemoryMemberRepository implements MemberRepository {
         members.put(member.getEmail(), member);
         return member;
     }
+
+    @Override
+    public void clear() {
+        members.clear();
+    }
 }
