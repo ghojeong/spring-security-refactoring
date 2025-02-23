@@ -17,6 +17,9 @@ public class CsrfConfigurer implements SecurityConfigurer {
     private final List<RequestMatcher> ignoredCsrfProtectionMatchers = new ArrayList<>();
 
     @Override
+    public void init(HttpSecurity http) {}
+
+    @Override
     public void configure(HttpSecurity http) {
         final CsrfFilter filter = new CsrfFilter();
         final RequestMatcher requireCsrfProtectionMatcher = getRequireCsrfProtectionMatcher();

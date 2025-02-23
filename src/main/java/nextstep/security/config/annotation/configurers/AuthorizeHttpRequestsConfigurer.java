@@ -33,6 +33,9 @@ public class AuthorizeHttpRequestsConfigurer implements SecurityConfigurer {
     }
 
     @Override
+    public void init(HttpSecurity http) {}
+
+    @Override
     public void configure(HttpSecurity http) {
         http.addFilter(new AuthorizationFilter(
                 registry.createAuthorizationManager()
