@@ -16,20 +16,17 @@ import org.springframework.web.filter.GenericFilterBean;
 import java.io.IOException;
 
 public abstract class AbstractAuthenticationProcessingFilter extends GenericFilterBean {
-    private AuthenticationManager authenticationManager;
-
-    private final RequestMatcher requiresAuthenticationRequestMatcher;
-
-    private final SecurityContextRepository securityContextRepository = new SecurityContextRepository();
-
     private static final AuthenticationSuccessHandler successHandler = (request, response, authentication) -> response.sendRedirect("/");
     private static final AuthenticationFailureHandler failureHandler = (request, response, exception) -> response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+    private final SecurityContextRepository securityContextRepository = new SecurityContextRepository();
+    private final RequestMatcher requiresAuthenticationRequestMatcher;
+    private AuthenticationManager authenticationManager;
 
     protected AbstractAuthenticationProcessingFilter(String filterProcessesUrl, AuthenticationManager authenticationManager) {
-        this(request -> {
-            String uri = request.getRequestURI();
-            return uri.startsWith(filterProcessesUrl);
-        }, authenticationManager);
+        this(
+                request -> request.getRequestURI().startsWith(filterProcessesUrl),
+                authenticationManager
+        );
     }
 
     protected AbstractAuthenticationProcessingFilter(RequestMatcher requiresAuthenticationRequestMatcher, AuthenticationManager authenticationManager) {
@@ -64,15 +61,13 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authResult);
         SecurityContextHolder.setContext(context);
-        this.securityContextRepository.saveContext(context, request, response);
-
-        this.successHandler.onAuthenticationSuccess(request, response, authResult);
+        securityContextRepository.saveContext(context, request, response);
+        successHandler.onAuthenticationSuccess(request, response, authResult);
     }
 
     private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         SecurityContextHolder.clearContext();
-
-        this.failureHandler.onAuthenticationFailure(request, response, failed);
+        failureHandler.onAuthenticationFailure(request, response, failed);
     }
 
     protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
@@ -84,5 +79,9 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 
     protected AuthenticationManager getAuthenticationManager() {
         return authenticationManager;
+    }
+
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
     }
 }
