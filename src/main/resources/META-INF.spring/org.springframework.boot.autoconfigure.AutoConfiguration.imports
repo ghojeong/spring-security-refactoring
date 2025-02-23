@@ -1,0 +1,3 @@
+nextstep.security.autoconfigure.OAuth2ClientAutoConfiguration
+nextstep.security.autoconfigure.OAuth2ClientRegistrationRepositoryConfiguration
+nextstep.security.autoconfigure.SecurityFilterAutoConfiguration
