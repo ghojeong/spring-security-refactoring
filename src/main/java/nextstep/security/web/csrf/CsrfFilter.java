@@ -15,10 +15,12 @@ import java.util.Set;
 
 // NOTE: https://github.com/spring-projects/spring-security/blob/main/web/src/main/java/org/springframework/security/web/access/AccessDeniedHandler.java
 public class CsrfFilter extends OncePerRequestFilter {
+    public static final RequestMatcher DEFAULT_CSRF_MATCHER = DefaultRequiresCsrfMatcher.INSTANCE;
+
     private final AccessDeniedHandler accessDeniedHandler = AccessDeniedHandlerImpl.getInstance();
     private final CsrfTokenRepository tokenRepository = HttpSessionCsrfTokenRepository.getInstance();
 
-    private RequestMatcher csrfMatcher = DefaultRequiresCsrfMatcher.INSTANCE;
+    private RequestMatcher csrfMatcher = DEFAULT_CSRF_MATCHER;
 
     public void setRequireCsrfProtectionMatcher(RequestMatcher requireCsrfProtectionMatcher) {
         csrfMatcher = requireCsrfProtectionMatcher;
