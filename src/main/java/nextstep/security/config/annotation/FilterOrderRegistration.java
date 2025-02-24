@@ -8,6 +8,7 @@ import nextstep.security.context.SecurityContextHolderFilter;
 import nextstep.security.web.csrf.CsrfFilter;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +50,12 @@ public class FilterOrderRegistration {
             }
             clazz = clazz.getSuperclass();
         }
-        return null;
+        return getMaxOrder() + 1;
+    }
+
+    private Integer getMaxOrder() {
+        return filterToOrder.isEmpty() ? 0
+                : Collections.max(filterToOrder.values());
     }
 
     private static class Step {

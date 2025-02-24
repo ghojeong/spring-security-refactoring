@@ -68,10 +68,9 @@ public class HttpSecurity {
     }
 
     public HttpSecurity addFilter(Filter filter) {
-        final Integer order = filterOrders.getOrder(filter.getClass());
-        if (order != null) {
-            filters.add(new OrderedFilter(filter, order));
-        }
+        filters.add(new OrderedFilter(
+                filter, filterOrders.getOrder(filter.getClass())
+        ));
         return this;
     }
 
