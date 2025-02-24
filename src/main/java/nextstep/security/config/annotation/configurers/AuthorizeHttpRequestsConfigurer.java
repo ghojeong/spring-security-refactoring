@@ -92,6 +92,9 @@ public class AuthorizeHttpRequestsConfigurer implements SecurityConfigurer {
     }
 
     public class AuthorizedUrl {
+        private static final AuthorizationManager<?> PERMIT_ALL_MANAGER = (a, o) -> new AuthorizationDecision(true);
+        private static final AuthorizationManager<?> AUTHENTICATED_MANAGER = new AuthenticatedAuthorizationManager<>();
+
         private final List<? extends RequestMatcher> matchers;
 
         AuthorizedUrl(List<? extends RequestMatcher> matchers) {
@@ -99,7 +102,7 @@ public class AuthorizeHttpRequestsConfigurer implements SecurityConfigurer {
         }
 
         public AuthorizationManagerRequestMatcherRegistry permitAll() {
-            return access((a, o) -> new AuthorizationDecision(true));
+            return access(PERMIT_ALL_MANAGER);
         }
 
         public AuthorizationManagerRequestMatcherRegistry hasRole(String role) {
@@ -107,7 +110,7 @@ public class AuthorizeHttpRequestsConfigurer implements SecurityConfigurer {
         }
 
         public AuthorizationManagerRequestMatcherRegistry authenticated() {
-            return access(new AuthenticatedAuthorizationManager<>());
+            return access(AUTHENTICATED_MANAGER);
         }
 
         public AuthorizationManagerRequestMatcherRegistry access(AuthorizationManager<?> manager) {
