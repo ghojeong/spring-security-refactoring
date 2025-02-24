@@ -52,10 +52,10 @@ public class HttpSecurity {
     }
 
     public DefaultSecurityFilterChain build() {
+        setSharedObject(AuthenticationManager.class, getAuthenticationRegistry().build());
         for (SecurityConfigurer configurer : configurers.values()) {
             configurer.init(this);
         }
-        setSharedObject(AuthenticationManager.class, getAuthenticationRegistry().build());
         for (SecurityConfigurer configurer : configurers.values()) {
             configurer.configure(this);
         }
