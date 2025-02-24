@@ -23,7 +23,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
-                .csrf(c -> c.ignoringRequestMatchers("/login", "/logout"))
+                .csrf(c -> c.ignoringRequestMatchers("/login"))
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 .requestMatchers("/members").hasRole("ADMIN")
