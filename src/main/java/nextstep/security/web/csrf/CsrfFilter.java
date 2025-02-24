@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import nextstep.security.access.AccessDeniedHandler;
-import nextstep.security.access.AccessDeniedHandlerImpl;
 import nextstep.security.access.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,10 +16,15 @@ import java.util.Set;
 public class CsrfFilter extends OncePerRequestFilter {
     public static final RequestMatcher DEFAULT_CSRF_MATCHER = DefaultRequiresCsrfMatcher.INSTANCE;
 
-    private final AccessDeniedHandler accessDeniedHandler = AccessDeniedHandlerImpl.getInstance();
-    private final CsrfTokenRepository tokenRepository = HttpSessionCsrfTokenRepository.getInstance();
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final CsrfTokenRepository tokenRepository;
 
     private RequestMatcher csrfMatcher = DEFAULT_CSRF_MATCHER;
+
+    public CsrfFilter(AccessDeniedHandler accessDeniedHandler, CsrfTokenRepository tokenRepository) {
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.tokenRepository = tokenRepository;
+    }
 
     public void setRequireCsrfProtectionMatcher(RequestMatcher requireCsrfProtectionMatcher) {
         csrfMatcher = requireCsrfProtectionMatcher;

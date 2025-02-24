@@ -1,5 +1,6 @@
 package nextstep.security.config.annotation.configurers;
 
+import nextstep.security.access.AccessDeniedHandlerImpl;
 import nextstep.security.access.AndRequestMatcher;
 import nextstep.security.access.MvcRequestMatcher;
 import nextstep.security.access.NegatedRequestMatcher;
@@ -7,6 +8,7 @@ import nextstep.security.access.OrRequestMatcher;
 import nextstep.security.access.RequestMatcher;
 import nextstep.security.config.annotation.HttpSecurity;
 import nextstep.security.web.csrf.CsrfFilter;
+import nextstep.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,10 @@ public class CsrfConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(HttpSecurity http) {
-        final CsrfFilter filter = new CsrfFilter();
+        final CsrfFilter filter = new CsrfFilter(
+                AccessDeniedHandlerImpl.getInstance(),
+                HttpSessionCsrfTokenRepository.getInstance()
+        );
         final RequestMatcher requireCsrfProtectionMatcher = getRequireCsrfProtectionMatcher();
         if (requireCsrfProtectionMatcher != null) {
             filter.setRequireCsrfProtectionMatcher(requireCsrfProtectionMatcher);
