@@ -2,6 +2,8 @@ package nextstep.app;
 
 import nextstep.oauth2.OAuth2ClientProperties;
 import nextstep.oauth2.registration.ClientRegistrationRepository;
+import nextstep.security.access.AccessDeniedHandler;
+import nextstep.security.access.AccessDeniedHandlerImpl;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchyImpl;
 import nextstep.security.authorization.SecuredMethodInterceptor;
@@ -9,6 +11,8 @@ import nextstep.security.config.Customizer;
 import nextstep.security.config.SecurityFilterChain;
 import nextstep.security.config.annotation.EnableWebSecurity;
 import nextstep.security.config.annotation.HttpSecurity;
+import nextstep.security.web.csrf.CsrfTokenRepository;
+import nextstep.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +25,17 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            AccessDeniedHandler accessDeniedHandler,
+            CsrfTokenRepository csrfTokenRepository
+    ) {
         return http
-                .csrf(c -> c.ignoringRequestMatchers("/login"))
-                .authorizeHttpRequests(
+                .csrf(
+                        c -> c.ignoringRequestMatchers("/login"),
+                        accessDeniedHandler,
+                        csrfTokenRepository
+                ).authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 .requestMatchers("/members").hasRole("ADMIN")
                                 .requestMatchers("/members/me").hasRole("USER")
@@ -51,5 +62,15 @@ public class SecurityConfig {
     @Bean
     ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties properties) {
         return ClientRegistrationRepository.of(properties);
+    }
+
+    @Bean
+    AccessDeniedHandler accessDeniedHandler() {
+        return new AccessDeniedHandlerImpl();
+    }
+
+    @Bean
+    CsrfTokenRepository csrfTokenRepository() {
+        return new HttpSessionCsrfTokenRepository();
     }
 }

@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import nextstep.security.access.AccessDeniedHandler;
 import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.authentication.AuthenticationProvider;
 import nextstep.security.config.Customizer;
@@ -16,6 +17,7 @@ import nextstep.security.config.annotation.configurers.HttpBasicConfigurer;
 import nextstep.security.config.annotation.configurers.OAuth2LoginConfigurer;
 import nextstep.security.config.annotation.configurers.SecurityConfigurer;
 import nextstep.security.config.annotation.configurers.SecurityContextConfigurer;
+import nextstep.security.web.csrf.CsrfTokenRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.OrderComparator;
 import org.springframework.core.Ordered;
@@ -83,8 +85,14 @@ public class HttpSecurity {
         return getSharedObject(AuthenticationManagerBuilder.class);
     }
 
-    public HttpSecurity csrf(Customizer<CsrfConfigurer> csrfCustomizer) {
-        csrfCustomizer.customize(getOrApply(new CsrfConfigurer()));
+    public HttpSecurity csrf(
+            Customizer<CsrfConfigurer> csrfCustomizer,
+            AccessDeniedHandler accessDeniedHandler,
+            CsrfTokenRepository csrfTokenRepository
+    ) {
+        csrfCustomizer.customize(getOrApply(new CsrfConfigurer(
+                accessDeniedHandler, csrfTokenRepository
+        )));
         return this;
     }
 
