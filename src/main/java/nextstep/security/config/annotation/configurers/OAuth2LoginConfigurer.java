@@ -28,15 +28,16 @@ public class OAuth2LoginConfigurer implements SecurityConfigurer {
         http.authenticationProvider(new OAuth2LoginAuthenticationProvider(
                 getOAuth2UserService(http)
         ));
-        http.addFilter(new OAuth2AuthorizationRequestRedirectFilter(
-                getClientRegistrationRepository(http)
-        ));
         authFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
-        http.addFilter(authFilter);
     }
 
     @Override
-    public void configure(HttpSecurity http) {}
+    public void configure(HttpSecurity http) {
+        http.addFilter(new OAuth2AuthorizationRequestRedirectFilter(
+                getClientRegistrationRepository(http)
+        ));
+        http.addFilter(authFilter);
+    }
 
     private OAuth2UserService getOAuth2UserService(HttpSecurity http) {
         return http.getSharedObject(ApplicationContext.class)
