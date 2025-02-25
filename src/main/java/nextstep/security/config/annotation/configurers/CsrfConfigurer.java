@@ -24,8 +24,8 @@ public class CsrfConfigurer implements SecurityConfigurer {
     @Override
     public void configure(HttpSecurity http) {
         final CsrfFilter filter = new CsrfFilter(
-                AccessDeniedHandlerImpl.getInstance(),
-                HttpSessionCsrfTokenRepository.getInstance()
+                new AccessDeniedHandlerImpl(),
+                new HttpSessionCsrfTokenRepository()
         );
         final RequestMatcher requireCsrfProtectionMatcher = getRequireCsrfProtectionMatcher();
         if (requireCsrfProtectionMatcher != null) {

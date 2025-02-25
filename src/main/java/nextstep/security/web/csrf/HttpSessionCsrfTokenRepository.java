@@ -13,12 +13,6 @@ public final class HttpSessionCsrfTokenRepository implements CsrfTokenRepository
     private static final String ATTRIBUTE_NAME = HttpSessionCsrfTokenRepository.class
             .getName().concat(".CSRF_TOKEN");
 
-    private HttpSessionCsrfTokenRepository() {}
-
-    public static HttpSessionCsrfTokenRepository getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
-
     @Override
     public CsrfToken generateToken(HttpServletRequest request) {
         return new CsrfToken(HEADER_NAME, PARAMETER_NAME, UUID.randomUUID().toString());
@@ -43,9 +37,5 @@ public final class HttpSessionCsrfTokenRepository implements CsrfTokenRepository
             return null;
         }
         return (CsrfToken) session.getAttribute(ATTRIBUTE_NAME);
-    }
-
-    private static class SingletonHolder {
-        private static final HttpSessionCsrfTokenRepository INSTANCE = new HttpSessionCsrfTokenRepository();
     }
 }
