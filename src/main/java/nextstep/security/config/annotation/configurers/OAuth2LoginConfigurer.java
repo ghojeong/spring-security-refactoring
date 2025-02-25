@@ -16,19 +16,16 @@ import java.util.Map;
 
 // NOTE: https://github.com/spring-projects/spring-security/blob/main/config/src/main/java/org/springframework/security/config/annotation/web/configurers/oauth2/client/OAuth2LoginConfigurer.java
 public class OAuth2LoginConfigurer implements SecurityConfigurer {
-    private OAuth2LoginAuthenticationFilter authFilter;
-
     @Override
     public void init(HttpSecurity http) {
-        this.authFilter = new OAuth2LoginAuthenticationFilter(
-                getClientRegistrationRepository(http),
-                getAuthorizedClientRepository(http),
-                null
-        );
         http.authenticationProvider(new OAuth2LoginAuthenticationProvider(
                 getOAuth2UserService(http)
         ));
+        final OAuth2LoginAuthenticationFilter authFilter = new OAuth2LoginAuthenticationFilter(
+                getClientRegistrationRepository(http), getAuthorizedClientRepository(http), null
+        );
         authFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
+        http.addFilter(authFilter);
     }
 
     @Override
@@ -36,7 +33,6 @@ public class OAuth2LoginConfigurer implements SecurityConfigurer {
         http.addFilter(new OAuth2AuthorizationRequestRedirectFilter(
                 getClientRegistrationRepository(http)
         ));
-        http.addFilter(authFilter);
     }
 
     private OAuth2UserService getOAuth2UserService(HttpSecurity http) {
